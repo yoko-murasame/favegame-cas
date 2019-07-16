@@ -1,0 +1,7 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration,\
+  org.apereo.cas.config.CasEmbeddedContainerTomcatConfiguration,\
+  org.apereo.cas.config.CasEmbeddedContainerTomcatFiltersConfiguration,\
+  cn.dmdream.cas.config.MyAuthenticationConfiguration,\
+  cn.dmdream.cas.config.WebflowConfiguration,\
+  cn.dmdream.cas.config.RedisConfiguration

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title th:text="#{cas.login.pagetitle}">登录</title>
+  <meta name="description" content="登陆页面">
+  <meta name="keywords" content="index">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="icon" type="image/png" href="/cas/assets/i/favicon.png">
+  <link rel="apple-touch-icon-precomposed" href="/cas/assets/i/app-icon72x72@2x.png">
+  <meta name="apple-mobile-web-app-title" content="Fave Game" />
+  <link rel="stylesheet" href="/cas/assets/css/amazeui.min.css" />
+  <link rel="stylesheet" href="/cas/assets/css/admin.css">
+  <link rel="stylesheet" href="/cas/assets/css/app.css">
+</head>
+
+<body data-type="login">
+
+  <div class="am-g myapp-login">
+	<div class="myapp-login-logo-block  tpl-login-max">
+		<div class="myapp-login-logo-text">
+			<div class="myapp-login-logo-text">
+				Fave Game<span> Login</span> <i class="am-icon-skyatlas"></i>
+			</div>
+		</div>
+
+		<div class="login-font">
+			<i>Log In </i> or <span> Sign Up</span>
+		</div>
+		<div class="am-u-sm-10 login-am-center">
+
+			<form method="post" id="fm1" th:object="${credential}" action="login">
+				<div class="alert alert-danger" th:if="${#fields.hasErrors('*')}" style="text-align: center">
+					<span style="color:#ccc;" th:each="err : ${#fields.errors('*')}" th:utext="${err}">Example error</span>
+					<h4 th:text></h4>
+				</div>
+
+				<h3 th:utext="#{screen.welcome.instructions}"  style="text-align: center;color: #999;">Enter your Username and Password</h3>
+
+				<fieldset>
+					<div class="am-form-group"  style="display: flex;">
+						<div th:if="${openIdLocalId}">
+							<strong>
+								<span th:utext="${openIdLocalId}"/>
+							</strong>
+							<input type="hidden"
+								   id="username2"
+								   name="phone"
+								   th:value="${openIdLocalId}"/>
+						</div>
+						<div th:unless="${openIdLocalId}" style="width: 80%;">
+							<input class="form-control required"
+								   id="username"
+								   name="username"
+								   placeholder="请输入手机号"
+								   size="25"
+								   tabindex="1"
+								   type="text"
+								   th:disabled="${guaEnabled}"
+								   th:field="*{username}"
+								   th:accesskey="#{screen.welcome.label.netid.accesskey}"
+								   autocomplete="off"/>
+						</div>
+						<button id="id-btn-sendSms" type="button" class="am-btn am-btn-default am-btn-default" style="width: 20%; margin-top: -4px;margin-left: 10px;overflow: hidden;">发送验证码</button>
+					</div>
+					<div class="am-form-group"  style="display: flex;width: 78%;">
+						<div style="width: 100%;margin-top: 5px;">
+							<input class="form-control required"
+								   type="text"
+								   id="password"
+								   name="password"
+								   placeholder="请输入六位短信校验码"
+								   size="25"
+								   tabindex="2"
+								   th:accesskey="#{screen.welcome.label.password.accesskey}"
+								   th:field="*{password}"
+								   autocomplete="off"/>
+							<span id="capslock-on" style="display:none;">
+                                <p>
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    <span th:utext="#{screen.capslock.on}"/>
+                                </p>
+                            </span>
+						</div>
+					</div>
+
+					<div class="am-form-group" style="display: flex;justify-content: space-between;margin-top: 16px;">
+						<div style="width: 78%;">
+							<input class="form-control required"
+								   id="capcha"
+								   name="capcha"
+								   placeholder="请输入验证码，点击图片可更新验证码"
+								   size="25"
+								   tabindex="3"
+								   th:field="*{capcha}"
+								   autocomplete="off"/>
+						</div>
+						<!--<img th:src="@{/capcha.jpg}" style="width: 160px;height:40px; ">-->
+						<img style="width: 19%;" th:src="@{/capcha.jpg}" id="capcha_img" onclick="javascript:refreshCapcha()"/>
+						<!--(看不清<a href="javascript:void(0)" onclick="javascript:refreshCaptcha()">换一张</a>)-->
+					</div>
+
+					<input type="hidden" name="execution" th:value="${flowExecutionKey}"/>
+					<input type="hidden" name="_eventId" value="submit"/>
+					<input type="hidden" name="geolocation"/>
+
+					<p>
+						<input class="am-btn am-btn-default"
+							   th:unless="${recaptchaSiteKey != null AND recaptchaInvisible != null AND recaptchaSiteKey != null AND recaptchaInvisible}"
+							   name="submit"
+							   accesskey="l"
+							   th:value="#{screen.welcome.button.login}"
+							   tabindex="6"
+							   type="submit"
+							   value="Login3"
+						/>
+						<button class="am-btn am-btn-default g-recaptcha"
+								th:if="${recaptchaSiteKey != null AND recaptchaInvisible != null AND recaptchaSiteKey != null AND recaptchaInvisible}"
+								th:attr="data-sitekey=${recaptchaSiteKey}, data-badge=${recaptchaPosition}"
+								data-callback="onSubmit"
+								name="submitBtn"
+								accesskey="l"
+								th:text="#{screen.welcome.button.login}"
+								tabindex="6"
+						/>
+					</p>
+				</fieldset>
+
+			</form>
+
+		</div>
+	</div>
+</div>
+
+  <script src="/cas/assets/js/jquery.min.js"></script>
+  <script src="/cas/assets/js/amazeui.min.js"></script>
+  <script src="/cas/assets/js/app.js"></script>
+<script>
+	$(function () {
+        $("#id-btn-sendSms").on("click", function () {
+            var phone =  $("#username").val();
+            var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+            if (!myreg.test(phone)) {
+                alert("手机号格式不正确！")
+                return false;
+            }
+            $.ajax({
+                url: "/cas/sendSms/" + $("#username").val(),
+                type: "post",
+                success: function(data) {
+                    if (data == "success") {
+                        $("#id-btn-sendSms").text("短信已发送");
+                        $("#id-btn-sendSms").attr('disabled','');
+                    }else{
+                        alert(data);
+					}
+                }
+            });
+        });
+    })
+
+    function refreshCapcha(){
+        $("#capcha_img").attr("src","/cas/capcha.jpg?id=" + new Date() + Math.floor(Math.random()*24));
+    }
+</script>
+</body>
+
+</html>

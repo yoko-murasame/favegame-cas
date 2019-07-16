@@ -1,3 +1,5 @@
+FaveGame项目地址 https://github.com/yoko-murasame/favegame
+
 CAS Overlay Template
 ============================
 
